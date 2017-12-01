@@ -6,6 +6,8 @@ import com.thoughtworks.xstream.XStream;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 
 @Path("carrinhos")
 public class CarrinhoResource {
@@ -19,10 +21,11 @@ public class CarrinhoResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
-    public String adiciona(String conteudo) {
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response adiciona(String conteudo) {
         Carrinho carrinho = (Carrinho) new XStream().fromXML(conteudo);
         new CarrinhoDAO().adiciona(carrinho);
-        return "<status>sucesso</status>";
+        URI uri = URI.create("/carrinhos/" + carrinho.getId());
+        return Response.created(uri).build();
     }
 }
