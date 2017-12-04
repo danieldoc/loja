@@ -5,6 +5,8 @@ import br.com.alura.loja.modelo.Projeto;
 import com.thoughtworks.xstream.XStream;
 import junit.framework.TestCase;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,12 +23,18 @@ public class ClienteTest extends TestCase {
 
     private HttpServer server;
 
-    private Client client = ClientBuilder.newClient();
-    private WebTarget target = client.target("http://localhost:8080");
+    private Client client;
+    private WebTarget target;
 
     @Before
     public void startaServidor() {
-        this.server = Servidor.inicializaServidor();
+        server = Servidor.inicializaServidor();
+
+        ClientConfig config = new ClientConfig();
+        config.register(new LoggingFilter());
+
+        this.client = ClientBuilder.newClient(config);
+        this.target = client.target("http://localhost:8080");
     }
 
     @After
