@@ -57,8 +57,7 @@ public class ClienteTest extends TestCase {
 
     @Test
     public void testaQueBuscarUmProjetosTrazOProjetoEsperado() {
-        String conteudo = target.path("/projetos").request().get(String.class);
-        Projeto projeto = (Projeto) new XStream().fromXML(conteudo);
+        Projeto projeto = target.path("/projetos").request().get(Projeto.class);
         Assert.assertEquals("Minha Loja", projeto.getNome());
     }
 
@@ -68,15 +67,14 @@ public class ClienteTest extends TestCase {
         carrinho.adiciona(new Produto(314L, "Tablet", 999, 1));
         carrinho.setRua("Rua Vergueiro");
         carrinho.setCidade("Sao Paulo");
-        String xml = carrinho.toXML();
 
-        Entity<String> entity = Entity.entity(xml, MediaType.APPLICATION_XML);
+        Entity<Carrinho> entity = Entity.entity(carrinho, MediaType.APPLICATION_XML);
 
         Response response = target.path("/carrinhos").request().post(entity);
         Assert.assertEquals(201, response.getStatus());
 
         String location = response.getHeaderString("location");
-        String conteudo = client.target(location).request().get(String.class);
-        Assert.assertTrue(conteudo.contains("Tablet"));
+        Carrinho carrinhoCarregado = client.target(location).request().get(Carrinho.class);
+        Assert.assertEquals("Tablet", carrinhoCarregado.getProdutos().get(0).getNome());
     }
 }
